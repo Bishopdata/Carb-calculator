@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Diabetic Daily Carb Calculator</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #f0f5f3;
+  --card: #ffffff;
+  --teal: #0a7c6e;
+  --teal-dark: #075f54;
+  --teal-light: #e5f3f0;
+  --teal-mid: #c8e8e3;
+  --accent: #e07a4a;
+  --text: #1a2e2b;
+  --muted: #6b7f7d;
+  --border: #d4e2de;
+  --radius: 14px;
+  --shadow: 0 2px 16px rgba(10,124,110,0.07);
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Outfit', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  padding: 2.5rem 1.25rem 3rem;
+}
+
+.calculator {
+  max-width: 580px;
+  margin: 0 auto;
+}
+
+/* Header */
+.header {
+  margin-bottom: 2rem;
+}
+
+.header-eyebrow {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--teal);
+  margin-bottom: 0.5rem;
+}
+
+h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: 2.4rem;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.15;
+  margin-bottom: 0.5rem;
+}
+
+.subtitle {
+  color: var(--muted);
+  font-size: 0.92rem;
+  font-weight: 300;
+  line-height: 1.6;
+}
+
+/* Cards */
+.card {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 1.6rem;
+  margin-bottom: 1rem;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+}
+
+.section-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--teal);
+  margin-bottom: 1.1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.section-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--teal-mid);
+}
+
+/* Input grid */
+.input-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.field label {
+  font-size: 0.8rem;
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.field input[type="number"] {
+  padding: 0.65rem 0.9rem;
+  border: 1.5px solid var(--border);
+  border-radius: 9px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 1rem;
+  color: var(--text);
+  background: white;
+  outline: none;
+  transition: border-color 0.18s, box-shadow 0.18s;
+  width: 100%;
+  -moz-appearance: textfield;
+}
+
+.field input[type="number"]::-webkit-outer-spin-button,
+.field input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
+
+.field input[type="number"]:focus {
+  border-color: var(--teal);
+  box-shadow: 0 0 0 3px rgba(10,124,110,0.1);
+}
+
+/* Segmented control */
+.seg {
+  display: flex;
+  background: var(--teal-light);
+  border-radius: 9px;
+  padding: 3px;
+  gap: 3px;
+}
+
+.seg button {
+  flex: 1;
+  padding: 0.52rem;
+  border: none;
+  background: transparent;
+  border-radius: 7px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.18s;
+}
+
+.seg button.active {
+  background: var(--teal);
+  color: white;
+  box-shadow: 0 1px 4px rgba(10,124,110,0.25);
+}
+
+/* Measure inputs */
+.measure-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.measure-label {
+  font-size: 0.8rem;
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.measure-row {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.measure-row input[type="number"] {
+  flex: 1;
+  padding: 0.65rem 0.9rem;
+  border: 1.5px solid var(--border);
+  border-radius: 9px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 1rem;
+  color: var(--text);
+  background: white;
+  outline: none;
+  transition: border-color 0.18s, box-shadow 0.18s;
+  min-width: 0;
+  -moz-appearance: textfield;
+}
+
+.measure-row input[type="number"]::-webkit-outer-spin-button,
+.measure-row input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
+
+.measure-row input[type="number"]:focus {
+  border-color: var(--teal);
+  box-shadow: 0 0 0 3px rgba(10,124,110,0.1);
+}
+
+.unit-pill {
+  display: flex;
+  background: var(--teal-light);
+  border-radius: 8px;
+  padding: 3px;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.unit-pill button {
+  padding: 0.42rem 0.65rem;
+  border: none;
+  background: transparent;
+  border-radius: 6px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.18s;
+  white-space: nowrap;
+}
+
+.unit-pill button.active {
+  background: var(--teal);
+  color: white;
+}
+
+/* Activity options */
+.activity-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.activity-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.8rem;
+  padding: 0.8rem 1rem;
+  border: 1.5px solid var(--border);
+  border-radius: 11px;
+  cursor: pointer;
+  transition: all 0.18s;
+  user-select: none;
+}
+
+.activity-option:hover {
+  border-color: var(--teal);
+  background: var(--teal-light);
+}
+
+.activity-option.selected {
+  border-color: var(--teal);
+  background: var(--teal-light);
+}
+
+.radio-dot {
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--border);
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-top: 2px;
+  transition: all 0.18s;
+  position: relative;
+}
+
+.activity-option.selected .radio-dot {
+  border-color: var(--teal);
+  background: var(--teal);
+}
+
+.activity-option.selected .radio-dot::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 6px;
+  height: 6px;
+  background: white;
+  border-radius: 50%;
+}
+
+.act-text { flex: 1; }
+.act-name {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 0.1rem;
+}
+
+.act-desc {
+  font-size: 0.76rem;
+  color: var(--muted);
+  line-height: 1.4;
+}
+
+/* HbA1c */
+.hba1c-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.hba1c-note {
+  grid-column: 1 / -1;
+  font-size: 0.75rem;
+  color: var(--muted);
+  background: var(--teal-light);
+  border-radius: 8px;
+  padding: 0.65rem 0.85rem;
+  line-height: 1.5;
+  margin-top: 0.25rem;
+}
+
+/* Meals */
+.meals-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 4px;
+  background: var(--teal-light);
+  border-radius: 11px;
+  padding: 4px;
+}
+
+.meals-grid button {
+  padding: 0.7rem;
+  border: none;
+  background: transparent;
+  border-radius: 8px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.18s;
+}
+
+.meals-grid button.active {
+  background: var(--teal);
+  color: white;
+  box-shadow: 0 1px 4px rgba(10,124,110,0.25);
+}
+
+/* Error state */
+.error-msg {
+  background: #fff5f5;
+  border: 1px solid #fed7d7;
+  color: #c53030;
+  border-radius: 9px;
+  padding: 0.8rem 1rem;
+  font-size: 0.85rem;
+  margin-bottom: 1rem;
+  display: none;
+}
+
+.error-msg.show { display: block; }
+
+/* Calculate button */
+.calc-btn {
+  width: 100%;
+  padding: 1.1rem;
+  background: var(--teal);
+  color: white;
+  border: none;
+  border-radius: var(--radius);
+  font-family: 'Outfit', sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  letter-spacing: 0.02em;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+}
+
+.calc-btn:hover {
+  background: var(--teal-dark);
+  transform: translateY(-1px);
+  box-shadow: 0 5px 18px rgba(10,124,110,0.28);
+}
+
+.calc-btn:active { transform: translateY(0); }
+
+.calc-btn svg {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+/* Result card */
+.result-card {
+  background: linear-gradient(135deg, var(--teal) 0%, #0d9080 100%);
+  border-radius: var(--radius);
+  padding: 2rem;
+  margin-bottom: 1rem;
+  color: white;
+  display: none;
+  position: relative;
+  overflow: hidden;
+}
+
+.result-card::before {
+  content: '';
+  position: absolute;
+  top: -30px;
+  right: -30px;
+  width: 140px;
+  height: 140px;
+  background: rgba(255,255,255,0.06);
+  border-radius: 50%;
+}
+
+.result-card::after {
+  content: '';
+  position: absolute;
+  bottom: -50px;
+  left: 40px;
+  width: 180px;
+  height: 180px;
+  background: rgba(255,255,255,0.04);
+  border-radius: 50%;
+}
+
+.result-card.show {
+  display: block;
+  animation: fadeUp 0.38s ease;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.result-eyebrow {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  opacity: 0.65;
+  margin-bottom: 0.5rem;
+  position: relative;
+  z-index: 1;
+}
+
+.result-main {
+  display: flex;
+  align-items: baseline;
+  gap: 0.3rem;
+  margin-bottom: 0.6rem;
+  position: relative;
+  z-index: 1;
+}
+
+.result-number {
+  font-family: 'Playfair Display', serif;
+  font-size: 4.5rem;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.result-unit-text {
+  font-size: 1.5rem;
+  font-weight: 300;
+  opacity: 0.8;
+}
+
+.result-details {
+  font-size: 0.82rem;
+  opacity: 0.65;
+  line-height: 1.6;
+  position: relative;
+  z-index: 1;
+}
+
+.result-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  position: relative;
+  z-index: 1;
+}
+
+.result-pill {
+  background: rgba(255,255,255,0.15);
+  border-radius: 20px;
+  padding: 0.3rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  backdrop-filter: blur(4px);
+}
+
+/* Distribution card */
+.dist-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 1.6rem;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  display: none;
+  margin-bottom: 1rem;
+}
+
+.dist-card.show {
+  display: block;
+  animation: fadeUp 0.38s ease 0.1s both;
+}
+
+.dist-toggle {
+  display: flex;
+  background: var(--teal-light);
+  border-radius: 9px;
+  padding: 3px;
+  gap: 3px;
+  margin-bottom: 1.25rem;
+}
+
+.dist-toggle button {
+  flex: 1;
+  padding: 0.6rem 0.5rem;
+  border: none;
+  background: transparent;
+  border-radius: 7px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.83rem;
+  font-weight: 500;
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.18s;
+  white-space: nowrap;
+}
+
+.dist-toggle button.active {
+  background: var(--teal);
+  color: white;
+  box-shadow: 0 1px 4px rgba(10,124,110,0.25);
+}
+
+.meal-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.meal-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.9rem 1.1rem;
+  background: var(--bg);
+  border-radius: 10px;
+  transition: background 0.15s;
+}
+
+.meal-row:first-child {
+  background: var(--teal-light);
+  border: 1px solid var(--teal-mid);
+}
+
+.meal-row-left {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+}
+
+.meal-icon {
+  width: 28px;
+  height: 28px;
+  background: var(--card);
+  border-radius: 7px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+}
+
+.meal-row-label {
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.meal-row-pct {
+  font-size: 0.72rem;
+  color: var(--muted);
+  margin-top: 0.05rem;
+}
+
+.meal-row-right {
+  text-align: right;
+}
+
+.meal-row-value {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.55rem;
+  color: var(--teal);
+  font-weight: 600;
+  line-height: 1;
+}
+
+.meal-row-unit {
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.73rem;
+  color: var(--muted);
+  margin-top: 0.1rem;
+}
+
+/* Disclaimer */
+.disclaimer {
+  font-size: 0.74rem;
+  color: var(--muted);
+  text-align: center;
+  line-height: 1.7;
+  padding: 0.5rem 1rem 1rem;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  h1 { font-size: 2rem; }
+  .input-grid { grid-template-columns: 1fr; }
+  .hba1c-grid { grid-template-columns: 1fr; }
+  .result-number { font-size: 3.5rem; }
+  body { padding: 1.75rem 1rem 2.5rem; }
+}
+</style>
+</head>
+<body>
+
+<div class="calculator">
+
+  <div class="header">
+    <div class="header-eyebrow">Blood Sugar Management</div>
+    <h1>Daily Carb<br>Calculator</h1>
+    <p class="subtitle">Personalised carbohydrate targets for people<br>managing diabetes &amp; blood sugar levels.</p>
+  </div>
+
+  <!-- Basic Info -->
+  <div class="card">
+    <div class="section-label">Basic Info</div>
+    <div class="input-grid">
+      <div class="field">
+        <label>Age</label>
+        <input type="number" id="age" min="1" max="120" placeholder="e.g. 45">
+      </div>
+      <div class="field">
+        <label>Gender</label>
+        <div class="seg" style="margin-top:2px;">
+          <button class="active" onclick="setGender('male',this)">Male</button>
+          <button onclick="setGender('female',this)">Female</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Height & Weight -->
+  <div class="card">
+    <div class="section-label">Height &amp; Weight</div>
+    <div style="display:flex;flex-direction:column;gap:1.1rem;">
+
+      <div class="measure-field">
+        <div class="measure-label">Height</div>
+        <div class="measure-row" id="height-cm-row">
+          <input type="number" id="height-cm" placeholder="cm" min="50" max="280">
+          <div class="unit-pill">
+            <button class="active" onclick="setHeightUnit('cm',this)">cm</button>
+            <button onclick="setHeightUnit('ft',this)">ft / in</button>
+          </div>
+        </div>
+        <div class="measure-row" id="height-ft-row" style="display:none;">
+          <input type="number" id="height-ft" placeholder="ft" min="1" max="9" style="max-width:90px;">
+          <input type="number" id="height-in" placeholder="in" min="0" max="11">
+          <div class="unit-pill">
+            <button onclick="setHeightUnit('cm',this)">cm</button>
+            <button class="active" onclick="setHeightUnit('ft',this)">ft / in</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="measure-field">
+        <div class="measure-label">Weight</div>
+        <div class="measure-row" id="weight-kg-row">
+          <input type="number" id="weight-kg" placeholder="kg" min="20" max="500">
+          <div class="unit-pill">
+            <button class="active" onclick="setWeightUnit('kg',this)">kg</button>
+            <button onclick="setWeightUnit('lbs',this)">lbs</button>
+          </div>
+        </div>
+        <div class="measure-row" id="weight-lbs-row" style="display:none;">
+          <input type="number" id="weight-lbs" placeholder="lbs" min="44" max="1100">
+          <div class="unit-pill">
+            <button onclick="setWeightUnit('kg',this)">kg</button>
+            <button class="active" onclick="setWeightUnit('lbs',this)">lbs</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Activity Level -->
+  <div class="card">
+    <div class="section-label">Activity Level</div>
+    <div class="activity-options" id="activity-options"></div>
+  </div>
+
+  <!-- HbA1c -->
+  <div class="card">
+    <div class="section-label">HbA1c Levels</div>
+    <div class="hba1c-grid">
+      <div class="field">
+        <label>Current HbA1c (%)</label>
+        <input type="number" id="current-hba1c" placeholder="6.5" min="4" max="20" step="0.1">
+      </div>
+      <div class="field">
+        <label>Goal HbA1c (%)</label>
+        <input type="number" id="goal-hba1c" placeholder="5.7" min="4" max="15" step="0.1">
+      </div>
+      <div class="hba1c-note">
+        Leave blank to use defaults — current: <strong>6.5%</strong>, goal: <strong>5.7%</strong>. Higher current HbA1c = lower carb target.
+      </div>
+    </div>
+  </div>
+
+  <!-- Meals per day -->
+  <div class="card">
+    <div class="section-label">Meals per Day</div>
+    <div class="meals-grid">
+      <button onclick="setMeals(1,this)">1</button>
+      <button onclick="setMeals(2,this)">2</button>
+      <button class="active" onclick="setMeals(3,this)">3</button>
+      <button onclick="setMeals(4,this)">4</button>
+    </div>
+  </div>
+
+  <div class="error-msg" id="error-msg"></div>
+
+  <button class="calc-btn" onclick="calculate()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="4" y="2" width="16" height="20" rx="2"/>
+      <line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="10" x2="16" y2="10"/>
+      <line x1="8" y1="14" x2="12" y2="14"/><line x1="15" y1="17" x2="15" y2="21"/>
+      <line x1="13" y1="19" x2="17" y2="19"/>
+    </svg>
+    Calculate My Carb Allowance
+  </button>
+
+  <!-- Result -->
+  <div class="result-card" id="result-card">
+    <div class="result-eyebrow">Daily Carb Allowance</div>
+    <div class="result-main">
+      <span class="result-number" id="result-number">—</span>
+      <span class="result-unit-text">g</span>
+    </div>
+    <div class="result-details" id="result-details"></div>
+    <div class="result-pills" id="result-pills"></div>
+  </div>
+
+  <!-- Distribution -->
+  <div class="dist-card" id="dist-card">
+    <div class="section-label">Meal Distribution</div>
+    <div class="dist-toggle">
+      <button class="active" onclick="setDist('equal',this)">Equal Distribution</button>
+      <button onclick="setDist('front',this)">Front Loading</button>
+    </div>
+    <div class="meal-rows" id="meal-rows"></div>
+  </div>
+
+  <p class="disclaimer">
+    This calculator is for informational purposes only and does not constitute medical advice.<br>
+    Always consult your doctor, endocrinologist, or registered dietitian before changing your diet.
+  </p>
+
+</div><!-- /.calculator -->
+
+<script>
+// ─── State ──────────────────────────────────────────
+let gender      = 'male';
+let heightUnit  = 'cm';
+let weightUnit  = 'kg';
+let activityIdx = null;
+let mealsPerDay = 3;
+let distMode    = 'equal';
+let dailyCarbs  = 0;
+
+// ─── Data ───────────────────────────────────────────
+const activities = [
+  { name:'Basal Metabolic Rate',     desc:'Body at complete rest — lying down all day, no movement.',                                              mult:1.0    },
+  { name:'Sedentary',                desc:'Little or no exercise; office worker who sits most of the day.',                                         mult:1.2    },
+  { name:'Lightly Active',           desc:'Some walking, occasional workouts 1–2 days a week.',                                                     mult:1.375  },
+  { name:'Light – Moderate',         desc:'Some sitting + regular movement; consistent but not intense exercise 3–4 days a week.',                  mult:1.4625 },
+  { name:'Moderately Active',        desc:'Often on your feet — nurse, teacher, retail worker; regular exercise 3–5 days a week.',                  mult:1.55   },
+  { name:'Very Active',              desc:'Physically demanding job + hard exercise 6–7 days a week (e.g. construction worker).',                   mult:1.725  },
+  { name:'Extra Active',             desc:'Heavy manual labour every day; also participates in sport daily.',                                        mult:1.9    },
+];
+
+const mealIcons  = ['🌅','☀️','🌇','🌙'];
+const mealNames2 = ['Breakfast','Dinner'];
+const mealNames3 = ['Breakfast','Lunch','Dinner'];
+const mealNames4 = ['Breakfast','Lunch','Dinner','Snack'];
+
+// ─── Render activities ───────────────────────────────
+function renderActivities() {
+  document.getElementById('activity-options').innerHTML = activities.map((a,i) => `
+    <div class="activity-option" id="act-${i}" onclick="selectActivity(${i})">
+      <div class="radio-dot" id="dot-${i}"></div>
+      <div class="act-text">
+        <div class="act-name">${a.name}</div>
+        <div class="act-desc">${a.desc}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function selectActivity(i) {
+  if (activityIdx !== null) document.getElementById(`act-${activityIdx}`).classList.remove('selected');
+  activityIdx = i;
+  document.getElementById(`act-${i}`).classList.add('selected');
+}
+
+// ─── Setters ────────────────────────────────────────
+function setGender(g, btn) {
+  gender = g;
+  btn.closest('.seg').querySelectorAll('button').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+function setHeightUnit(unit, btn) {
+  heightUnit = unit;
+  // Update both rows' pill buttons
+  document.querySelectorAll('#height-cm-row .unit-pill button, #height-ft-row .unit-pill button').forEach(b => {
+    b.classList.toggle('active', (unit === 'cm' && b.textContent.trim() === 'cm') || (unit === 'ft' && b.textContent.trim() === 'ft / in'));
+  });
+  document.getElementById('height-cm-row').style.display = unit === 'cm' ? '' : 'none';
+  document.getElementById('height-ft-row').style.display = unit === 'ft' ? '' : 'none';
+}
+
+function setWeightUnit(unit, btn) {
+  weightUnit = unit;
+  document.querySelectorAll('#weight-kg-row .unit-pill button, #weight-lbs-row .unit-pill button').forEach(b => {
+    b.classList.toggle('active', (unit === 'kg' && b.textContent.trim() === 'kg') || (unit === 'lbs' && b.textContent.trim() === 'lbs'));
+  });
+  document.getElementById('weight-kg-row').style.display = unit === 'kg' ? '' : 'none';
+  document.getElementById('weight-lbs-row').style.display = unit === 'lbs' ? '' : 'none';
+}
+
+function setMeals(n, btn) {
+  mealsPerDay = n;
+  btn.closest('.meals-grid').querySelectorAll('button').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  if (dailyCarbs > 0) renderDistribution();
+}
+
+function setDist(mode, btn) {
+  distMode = mode;
+  btn.closest('.dist-toggle').querySelectorAll('button').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  if (dailyCarbs > 0) renderDistribution();
+}
+
+// ─── Get measurements ────────────────────────────────
+function getHeightCm() {
+  if (heightUnit === 'cm') return parseFloat(document.getElementById('height-cm').value) || 0;
+  const ft = parseFloat(document.getElementById('height-ft').value) || 0;
+  const inches = parseFloat(document.getElementById('height-in').value) || 0;
+  return (ft * 30.48) + (inches * 2.54);
+}
+
+function getWeightKg() {
+  if (weightUnit === 'kg') return parseFloat(document.getElementById('weight-kg').value) || 0;
+  return (parseFloat(document.getElementById('weight-lbs').value) || 0) * 0.453592;
+}
+
+// ─── Error helper ────────────────────────────────────
+function showError(msg) {
+  const el = document.getElementById('error-msg');
+  el.textContent = msg;
+  el.classList.add('show');
+}
+function clearError() {
+  document.getElementById('error-msg').classList.remove('show');
+}
+
+// ─── Calculate ───────────────────────────────────────
+function calculate() {
+  clearError();
+
+  const age       = parseFloat(document.getElementById('age').value) || 0;
+  const heightCm  = getHeightCm();
+  const weightKg  = getWeightKg();
+  const curHba1c  = parseFloat(document.getElementById('current-hba1c').value) || 6.5;
+  const goalHba1c = parseFloat(document.getElementById('goal-hba1c').value)    || 5.7;
+
+  // Validation
+  if (!age || age < 1 || age > 120)     { showError('Please enter a valid age (1–120).'); return; }
+  if (!heightCm || heightCm < 50)        { showError('Please enter a valid height.'); return; }
+  if (!weightKg || weightKg < 10)        { showError('Please enter a valid weight.'); return; }
+  if (activityIdx === null)              { showError('Please select your activity level.'); return; }
+  if (goalHba1c > curHba1c)             { showError('Your goal HbA1c should be lower than or equal to your current HbA1c.'); return; }
+
+  // ── Mifflin-St Jeor BMR ──
+  let bmr = (10 * weightKg) + (6.25 * heightCm) - (5 * age) + (gender === 'male' ? 5 : -161);
+
+  // ── TDEE ──
+  const tdee = bmr * activities[activityIdx].mult;
+
+  // ── Carb % based on HbA1c ──
+  // Base 45%. Each 1% HbA1c above normal (5.7) reduces by 3%.
+  // An aggressive goal adds a further reduction.
+  let carbPct = 45;
+  const excess   = Math.max(0, curHba1c - 5.7);
+  const gapToGoal = Math.max(0, curHba1c - goalHba1c);
+  carbPct -= excess    * 3.0;
+  carbPct -= gapToGoal * 1.5;
+  carbPct  = Math.max(20, Math.min(45, carbPct));
+
+  // ── Daily carbs (1 g carb = 4 kcal) ──
+  dailyCarbs = Math.round((tdee * carbPct / 100) / 4);
+
+  // ── Show result ──
+  document.getElementById('result-number').textContent = dailyCarbs;
+  document.getElementById('result-details').textContent =
+    `Based on ${Math.round(carbPct)}% carbohydrate intake from your estimated ${Math.round(tdee).toLocaleString()} kcal daily energy needs.`;
+
+  document.getElementById('result-pills').innerHTML = [
+    `🔥 ${Math.round(tdee).toLocaleString()} kcal TDEE`,
+    `🧪 HbA1c ${curHba1c}% → ${goalHba1c}%`,
+    `📊 ${Math.round(carbPct)}% carb ratio`,
+  ].map(t => `<span class="result-pill">${t}</span>`).join('');
+
+  document.getElementById('result-card').classList.add('show');
+  document.getElementById('dist-card').classList.add('show');
+  renderDistribution();
+
+  setTimeout(() => {
+    document.getElementById('result-card').scrollIntoView({ behavior:'smooth', block:'start' });
+  }, 80);
+}
+
+// ─── Render distribution ─────────────────────────────
+function renderDistribution() {
+  const names = mealsPerDay === 1 ? ['Daily Total']
+              : mealsPerDay === 2 ? mealNames2
+              : mealsPerDay === 3 ? mealNames3
+              :                     mealNames4;
+
+  let portions = [];
+
+  if (distMode === 'equal') {
+    const base = Math.floor(dailyCarbs / mealsPerDay);
+    const rem  = dailyCarbs - base * mealsPerDay;
+    for (let i = 0; i < mealsPerDay; i++) portions.push(i === 0 ? base + rem : base);
+  } else {
+    // 50% first meal, rest split equally
+    const first = Math.round(dailyCarbs * 0.5);
+    const left  = dailyCarbs - first;
+    const others = mealsPerDay - 1;
+    if (others === 0) {
+      portions = [dailyCarbs];
+    } else {
+      const base = Math.floor(left / others);
+      const rem  = left - base * others;
+      portions   = [first];
+      for (let i = 0; i < others; i++) portions.push(i === 0 ? base + rem : base);
+    }
+  }
+
+  document.getElementById('meal-rows').innerHTML = portions.map((p, i) => {
+    const pct = Math.round((p / dailyCarbs) * 100);
+    return `
+      <div class="meal-row">
+        <div class="meal-row-left">
+          <div class="meal-icon">${mealIcons[i] || '🍽️'}</div>
+          <div>
+            <div class="meal-row-label">${names[i]}</div>
+            <div class="meal-row-pct">${pct}% of daily total</div>
+          </div>
+        </div>
+        <div class="meal-row-right">
+          <div class="meal-row-value">${p}</div>
+          <div class="meal-row-unit">g carbs</div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+// ─── Init ────────────────────────────────────────────
+renderActivities();
+</script>
+</body>
+</html>
