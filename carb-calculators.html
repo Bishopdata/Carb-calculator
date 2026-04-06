@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Daily Carb Allowance — Carb Counting Academy</title>
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600;700&family=Playfair+Display:wght@400;600&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg:         #f0f3ff;
+  --card:       #ffffff;
+  --blue:       #0000FF;
+  --blue-dark:  #0000cc;
+  --blue-light: #eaecff;
+  --blue-mid:   #c5caff;
+  --text:       #060629;
+  --muted:      #555580;
+  --border:     #cdd1f5;
+  --radius:     14px;
+  --shadow:     0 2px 16px rgba(0,0,255,0.07);
+}
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 18px;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  padding: 2.5rem 1.25rem 3rem;
+}
+.calculator { max-width: 620px; margin: 0 auto; }
+
+/* ── Logo header ── */
+.logo-header {
+  display: flex; flex-direction: column; align-items: center;
+  margin-bottom: 1rem; padding: 1.8rem 1.4rem 1.5rem;
+  background: var(--card); border-radius: var(--radius);
+  border: 1px solid var(--border); box-shadow: var(--shadow);
+}
+.logo-wrap {
+  width: 82px; height: 82px; border-radius: 50%; overflow: hidden;
+  margin-bottom: 1rem; border: 2px solid var(--blue-mid);
+  box-shadow: 0 2px 14px rgba(0,0,255,0.13); background: white;
+}
+.logo-wrap img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.header-eyebrow {
+  font-size: 0.65rem; font-weight: 700; letter-spacing: 0.18em;
+  text-transform: uppercase; color: var(--blue); margin-bottom: 0.45rem; text-align: center;
+}
+h1 {
+  font-family: 'Playfair Display', serif; font-size: 2.4rem; font-weight: 600;
+  color: var(--text); line-height: 1.15; text-align: center;
+}
+
+/* ── Cards ── */
+.card {
+  background: var(--card); border-radius: var(--radius); padding: 1.7rem;
+  margin-bottom: 1rem; border: 1px solid var(--border); box-shadow: var(--shadow);
+}
+.section-label {
+  font-size: 0.62rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase;
+  color: var(--blue); margin-bottom: 1.15rem; display: flex; align-items: center; gap: 0.5rem;
+}
+.section-label::after { content: ''; flex: 1; height: 1px; background: var(--blue-mid); }
+
+/* ── Input grid ── */
+.input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.1rem; }
+.field { display: flex; flex-direction: column; gap: 0.45rem; }
+.field label { font-size: 0.77rem; color: var(--muted); font-weight: 600; }
+.field input[type="number"] {
+  padding: 0.7rem 0.9rem; border: 1.5px solid var(--border); border-radius: 9px;
+  font-family: 'Open Sans', sans-serif; font-size: 1rem; color: var(--text);
+  background: white; outline: none; transition: border-color 0.18s, box-shadow 0.18s;
+  width: 100%; -moz-appearance: textfield;
+}
+.field input[type="number"]::-webkit-outer-spin-button,
+.field input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
+.field input[type="number"]:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(0,0,255,0.1); }
+
+/* ── Segmented ── */
+.seg {
+  display: flex; background: var(--blue-light); border-radius: 9px; padding: 3px; gap: 3px; margin-top: 2px;
+}
+.seg button {
+  flex: 1; padding: 0.52rem; border: none; background: transparent; border-radius: 7px;
+  font-family: 'Open Sans', sans-serif; font-size: 0.83rem; font-weight: 600;
+  color: var(--muted); cursor: pointer; transition: all 0.18s;
+}
+.seg button.active { background: var(--blue); color: white; box-shadow: 0 1px 5px rgba(0,0,255,0.3); }
+
+/* ── Measure fields ── */
+.measure-field { display: flex; flex-direction: column; gap: 0.45rem; }
+.measure-label { font-size: 0.77rem; color: var(--muted); font-weight: 600; }
+.measure-row { display: flex; gap: 0.5rem; align-items: center; }
+.measure-row input[type="number"] {
+  flex: 1; padding: 0.7rem 0.9rem; border: 1.5px solid var(--border); border-radius: 9px;
+  font-family: 'Open Sans', sans-serif; font-size: 1rem; color: var(--text); background: white;
+  outline: none; transition: border-color 0.18s, box-shadow 0.18s; min-width: 0; -moz-appearance: textfield;
+}
+.measure-row input[type="number"]::-webkit-outer-spin-button,
+.measure-row input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
+.measure-row input[type="number"]:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(0,0,255,0.1); }
+.unit-pill {
+  display: flex; background: var(--blue-light); border-radius: 8px; padding: 3px; gap: 2px; flex-shrink: 0;
+}
+.unit-pill button {
+  padding: 0.42rem 0.65rem; border: none; background: transparent; border-radius: 6px;
+  font-family: 'Open Sans', sans-serif; font-size: 0.7rem; font-weight: 700;
+  color: var(--muted); cursor: pointer; transition: all 0.18s; white-space: nowrap;
+}
+.unit-pill button.active { background: var(--blue); color: white; }
+
+/* ── Activity options ── */
+.activity-options { display: flex; flex-direction: column; gap: 0.5rem; }
+.activity-option {
+  display: flex; align-items: flex-start; gap: 0.85rem; padding: 0.88rem 1rem;
+  border: 1.5px solid var(--border); border-radius: 11px; cursor: pointer;
+  transition: all 0.18s; user-select: none;
+}
+.activity-option:hover { border-color: var(--blue); background: var(--blue-light); }
+.activity-option.selected { border-color: var(--blue); background: var(--blue-light); }
+.radio-dot {
+  width: 19px; height: 19px; border: 2px solid var(--border); border-radius: 50%;
+  flex-shrink: 0; margin-top: 2px; transition: all 0.18s; position: relative;
+}
+.activity-option.selected .radio-dot { border-color: var(--blue); background: var(--blue); }
+.activity-option.selected .radio-dot::after {
+  content: ''; position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%,-50%); width: 6px; height: 6px; background: white; border-radius: 50%;
+}
+.act-text { flex: 1; }
+.act-name { font-size: 0.88rem; font-weight: 700; color: var(--text); margin-bottom: 0.1rem; }
+.act-desc { font-size: 0.75rem; color: var(--muted); line-height: 1.45; }
+
+/* ── Weight goal ── */
+.goal-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 4px;
+  background: var(--blue-light); border-radius: 11px; padding: 4px;
+}
+.goal-grid button {
+  padding: 0.72rem 0.5rem; border: none; background: transparent; border-radius: 8px;
+  font-family: 'Open Sans', sans-serif; font-size: 0.83rem; font-weight: 700;
+  color: var(--muted); cursor: pointer; transition: all 0.18s; text-align: center;
+}
+.goal-grid button.active { background: var(--blue); color: white; box-shadow: 0 1px 5px rgba(0,0,255,0.28); }
+
+/* ── HbA1c ── */
+.hba1c-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.1rem; }
+.hba1c-note {
+  grid-column: 1/-1; font-size: 0.72rem; color: var(--muted);
+  background: var(--blue-light); border-radius: 8px; padding: 0.7rem 0.9rem;
+  line-height: 1.55; margin-top: 0.25rem;
+}
+
+/* ── Meals ── */
+.meals-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px;
+  background: var(--blue-light); border-radius: 11px; padding: 4px;
+}
+.meals-grid button {
+  padding: 0.75rem; border: none; background: transparent; border-radius: 8px;
+  font-family: 'Open Sans', sans-serif; font-size: 1.05rem; font-weight: 700;
+  color: var(--muted); cursor: pointer; transition: all 0.18s;
+}
+.meals-grid button.active { background: var(--blue); color: white; box-shadow: 0 1px 5px rgba(0,0,255,0.28); }
+
+/* ── Error ── */
+.error-msg {
+  background: #fff5f5; border: 1px solid #fed7d7; color: #c53030; border-radius: 9px;
+  padding: 0.85rem 1rem; font-size: 0.88rem; margin-bottom: 1rem; display: none;
+}
+.error-msg.show { display: block; }
+
+/* ── Calc button ── */
+.calc-btn {
+  width: 100%; padding: 1.1rem; background: var(--blue); color: white; border: none;
+  border-radius: var(--radius); font-family: 'Open Sans', sans-serif; font-size: 1rem; font-weight: 700;
+  cursor: pointer; transition: all 0.2s; letter-spacing: 0.03em; margin-bottom: 1rem;
+  display: flex; align-items: center; justify-content: center; gap: 0.6rem;
+}
+.calc-btn:hover { background: var(--blue-dark); transform: translateY(-1px); box-shadow: 0 6px 20px rgba(0,0,255,0.3); }
+.calc-btn:active { transform: translateY(0); }
+.calc-btn svg { width: 18px; height: 18px; flex-shrink: 0; }
+
+/* ── Result card ── */
+.result-card {
+  background: linear-gradient(140deg, #0000FF 0%, #2222ff 50%, #0000cc 100%);
+  border-radius: var(--radius); padding: 2rem; margin-bottom: 1rem;
+  color: white; display: none; position: relative; overflow: hidden;
+}
+.result-card::before {
+  content: ''; position: absolute; top: -40px; right: -40px;
+  width: 160px; height: 160px; background: rgba(255,255,255,0.06); border-radius: 50%;
+}
+.result-card::after {
+  content: ''; position: absolute; bottom: -60px; left: 30px;
+  width: 200px; height: 200px; background: rgba(255,255,255,0.04); border-radius: 50%;
+}
+.result-card.show { display: block; animation: fadeUp 0.38s ease; }
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.result-eyebrow {
+  font-size: 0.62rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase;
+  opacity: 0.65; margin-bottom: 0.5rem; position: relative; z-index: 1;
+}
+.result-main {
+  display: flex; align-items: baseline; gap: 0.3rem; margin-bottom: 0.3rem; position: relative; z-index: 1;
+}
+.result-number {
+  font-family: 'Playfair Display', serif; font-size: 4.5rem; font-weight: 600; line-height: 1;
+}
+.result-unit-text { font-size: 1.5rem; font-weight: 300; opacity: 0.8; }
+.result-subtitle { font-size: 0.8rem; opacity: 0.6; margin-bottom: 1rem; position: relative; z-index: 1; }
+.result-details { font-size: 0.82rem; opacity: 0.7; line-height: 1.6; position: relative; z-index: 1; }
+.result-pills {
+  display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1rem; position: relative; z-index: 1;
+}
+.result-pill {
+  background: rgba(255,255,255,0.15); border-radius: 20px; padding: 0.3rem 0.8rem;
+  font-size: 0.72rem; font-weight: 600; backdrop-filter: blur(4px);
+}
+
+/* ── Context chips (BMI + eAG goal only) ── */
+.context-row {
+  background: var(--card); border-radius: var(--radius); padding: 1.7rem;
+  border: 1px solid var(--border); box-shadow: var(--shadow);
+  display: none; margin-bottom: 1rem; gap: 0.75rem; flex-wrap: wrap;
+}
+.context-row.show { display: flex; animation: fadeUp 0.38s ease 0.05s both; }
+.context-chip {
+  flex: 1; min-width: 120px; background: var(--bg); border-radius: 9px;
+  padding: 0.85rem 1rem; border: 1px solid var(--border); display: flex; flex-direction: column; gap: 0.2rem;
+}
+.context-chip-label {
+  font-size: 0.65rem; font-weight: 700; color: var(--muted);
+  text-transform: uppercase; letter-spacing: 0.12em;
+}
+.context-chip-value { font-size: 1.1rem; font-weight: 700; color: var(--text); }
+.context-chip-sub { font-size: 0.7rem; color: var(--muted); }
+
+/* ── Distribution card ── */
+.dist-card {
+  background: var(--card); border-radius: var(--radius); padding: 1.7rem;
+  border: 1px solid var(--border); box-shadow: var(--shadow); display: none; margin-bottom: 1rem;
+}
+.dist-card.show { display: block; animation: fadeUp 0.38s ease 0.1s both; }
+.dist-toggle {
+  display: flex; background: var(--blue-light); border-radius: 9px; padding: 3px; gap: 3px; margin-bottom: 1.3rem;
+}
+.dist-toggle button {
+  flex: 1; padding: 0.63rem 0.5rem; border: none; background: transparent; border-radius: 7px;
+  font-family: 'Open Sans', sans-serif; font-size: 0.83rem; font-weight: 700;
+  color: var(--muted); cursor: pointer; transition: all 0.18s; white-space: nowrap;
+}
+.dist-toggle button.active { background: var(--blue); color: white; box-shadow: 0 1px 5px rgba(0,0,255,0.28); }
+.meal-rows { display: flex; flex-direction: column; gap: 0.5rem; }
+.meal-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0.95rem 1.1rem; background: var(--bg); border-radius: 10px;
+}
+.meal-row:first-child { background: var(--blue-light); border: 1px solid var(--blue-mid); }
+.meal-row-left { display: flex; align-items: center; gap: 0.75rem; }
+.meal-icon {
+  width: 30px; height: 30px; background: var(--card); border-radius: 7px;
+  display: flex; align-items: center; justify-content: center; font-size: 0.92rem;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+}
+.meal-row-label { font-size: 0.9rem; font-weight: 700; color: var(--text); }
+.meal-row-pct { font-size: 0.72rem; color: var(--muted); margin-top: 0.05rem; }
+.meal-row-value {
+  font-family: 'Playfair Display', serif; font-size: 1.6rem; color: var(--blue); font-weight: 600; line-height: 1;
+}
+.meal-row-unit { font-size: 0.72rem; color: var(--muted); margin-top: 0.1rem; text-align: right; }
+
+.disclaimer {
+  font-size: 0.72rem; color: var(--muted); text-align: center; line-height: 1.75; padding: 0.5rem 1rem 1rem;
+}
+
+@media (max-width: 480px) {
+  h1 { font-size: 1.9rem; }
+  .input-grid { grid-template-columns: 1fr; }
+  .hba1c-grid { grid-template-columns: 1fr; }
+  .result-number { font-size: 3.5rem; }
+  body { padding: 1.75rem 1rem 2.5rem; font-size: 16px; }
+}
+</style>
+</head>
+<body>
+<div class="calculator">
+
+  <!-- Logo + Title -->
+  <div class="logo-header">
+    <div class="logo-wrap">
+      <img src="data:image/jpeg;base64,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" alt="Carb Counting Academy Logo">
+    </div>
+    <div class="header-eyebrow">Carb Counting Academy</div>
+    <h1>Daily Carb<br>Allowance</h1>
+  </div>
+
+  <!-- Basic Info -->
+  <div class="card">
+    <div class="section-label">Basic Info</div>
+    <div class="input-grid">
+      <div class="field">
+        <label>Age</label>
+        <input type="number" id="age" min="1" max="120" placeholder="e.g. 45">
+      </div>
+      <div class="field">
+        <label>Gender</label>
+        <div class="seg">
+          <button class="active" onclick="setGender('male',this)">Male</button>
+          <button onclick="setGender('female',this)">Female</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Height & Weight -->
+  <div class="card">
+    <div class="section-label">Height &amp; Weight</div>
+    <div style="display:flex;flex-direction:column;gap:1.15rem;">
+      <div class="measure-field">
+        <div class="measure-label">Height</div>
+        <div class="measure-row" id="height-cm-row">
+          <input type="number" id="height-cm" placeholder="cm" min="50" max="280">
+          <div class="unit-pill">
+            <button class="active" onclick="setHeightUnit('cm',this)">cm</button>
+            <button onclick="setHeightUnit('ft',this)">ft / in</button>
+          </div>
+        </div>
+        <div class="measure-row" id="height-ft-row" style="display:none;">
+          <input type="number" id="height-ft" placeholder="ft" min="1" max="9" style="max-width:90px;">
+          <input type="number" id="height-in" placeholder="in" min="0" max="11">
+          <div class="unit-pill">
+            <button onclick="setHeightUnit('cm',this)">cm</button>
+            <button class="active" onclick="setHeightUnit('ft',this)">ft / in</button>
+          </div>
+        </div>
+      </div>
+      <div class="measure-field">
+        <div class="measure-label">Weight</div>
+        <div class="measure-row" id="weight-kg-row">
+          <input type="number" id="weight-kg" placeholder="kg" min="20" max="500">
+          <div class="unit-pill">
+            <button class="active" onclick="setWeightUnit('kg',this)">kg</button>
+            <button onclick="setWeightUnit('lbs',this)">lbs</button>
+          </div>
+        </div>
+        <div class="measure-row" id="weight-lbs-row" style="display:none;">
+          <input type="number" id="weight-lbs" placeholder="lbs" min="44" max="1100">
+          <div class="unit-pill">
+            <button onclick="setWeightUnit('kg',this)">kg</button>
+            <button class="active" onclick="setWeightUnit('lbs',this)">lbs</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Activity Level -->
+  <div class="card">
+    <div class="section-label">Activity Level</div>
+    <div class="activity-options" id="activity-options"></div>
+  </div>
+
+  <!-- Weight Goal -->
+  <div class="card">
+    <div class="section-label">Weight Goal</div>
+    <div class="goal-grid">
+      <button class="active" onclick="setGoal('maintain',this)">Maintain Weight</button>
+      <button onclick="setGoal('lose',this)">Lose Weight</button>
+    </div>
+  </div>
+
+  <!-- HbA1c -->
+  <div class="card">
+    <div class="section-label">HbA1c Levels</div>
+    <div class="hba1c-grid">
+      <div class="field">
+        <label>Current HbA1c (%)</label>
+        <input type="number" id="current-hba1c" placeholder="6.5" min="4" max="20" step="0.1">
+      </div>
+      <div class="field">
+        <label>Goal HbA1c — 3 months (%)</label>
+        <input type="number" id="goal-hba1c" placeholder="5.7" min="4" max="15" step="0.1">
+      </div>
+      <div class="hba1c-note">
+        Leave blank for defaults — current: <strong>6.5%</strong>, goal: <strong>5.7%</strong>.<br>
+        Goal is calibrated for a <strong>3-month reduction window</strong>. Higher current HbA1c and a more ambitious goal both reduce your carb target.
+      </div>
+    </div>
+  </div>
+
+  <!-- Meals per day -->
+  <div class="card">
+    <div class="section-label">Meals per Day</div>
+    <div class="meals-grid">
+      <button onclick="setMeals(1,this)">1</button>
+      <button onclick="setMeals(2,this)">2</button>
+      <button class="active" onclick="setMeals(3,this)">3</button>
+      <button onclick="setMeals(4,this)">4</button>
+    </div>
+  </div>
+
+  <div class="error-msg" id="error-msg"></div>
+
+  <button class="calc-btn" onclick="calculate()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="4" y="2" width="16" height="20" rx="2"/>
+      <line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="10" x2="16" y2="10"/>
+      <line x1="8" y1="14" x2="12" y2="14"/><line x1="15" y1="17" x2="15" y2="21"/>
+      <line x1="13" y1="19" x2="17" y2="19"/>
+    </svg>
+    Calculate My Daily Carb Allowance
+  </button>
+
+  <!-- Result card -->
+  <div class="result-card" id="result-card">
+    <div class="result-eyebrow">Your Daily Carb Allowance</div>
+    <div class="result-main">
+      <span class="result-number" id="result-number">—</span>
+      <span class="result-unit-text">g</span>
+    </div>
+    <div class="result-subtitle" id="result-subtitle"></div>
+    <div class="result-details" id="result-details"></div>
+    <div class="result-pills" id="result-pills"></div>
+  </div>
+
+  <!-- BMI + eAG Goal chips -->
+  <div class="context-row" id="context-row">
+    <div class="context-chip">
+      <div class="context-chip-label">Your BMI</div>
+      <div class="context-chip-value" id="ctx-bmi">—</div>
+      <div class="context-chip-sub" id="ctx-bmi-cat"></div>
+    </div>
+    <div class="context-chip">
+      <div class="context-chip-label">Goal Avg. Blood Sugar</div>
+      <div class="context-chip-value" id="ctx-eag-goal">—</div>
+      <div class="context-chip-sub">mg/dL (3-month target)</div>
+    </div>
+  </div>
+
+  <!-- Distribution -->
+  <div class="dist-card" id="dist-card">
+    <div class="section-label">Meal Distribution</div>
+    <div class="dist-toggle">
+      <button class="active" onclick="setDist('equal',this)">Equal Distribution</button>
+      <button onclick="setDist('front',this)">Front Loading</button>
+    </div>
+    <div class="meal-rows" id="meal-rows"></div>
+  </div>
+
+  <p class="disclaimer">
+    This calculator is for informational purposes only and does not constitute medical advice.<br>
+    Always consult your doctor, endocrinologist, or registered dietitian before changing your diet.
+  </p>
+
+</div>
+
+<script>
+let gender = 'male', heightUnit = 'cm', weightUnit = 'kg';
+let activityIdx = null, mealsPerDay = 3, distMode = 'equal', weightGoal = 'maintain';
+let dailyCarbs = 0;
+
+const activities = [
+  { name:'Basal Metabolic Rate',      desc:'Body at complete rest — lying down all day, no movement.',                                        mult:1.0    },
+  { name:'Sedentary',                 desc:'Little or no exercise; office worker who sits most of the day.',                                   mult:1.2    },
+  { name:'Lightly Active',            desc:'Some walking, occasional workouts 1–2 days a week.',                                              mult:1.375  },
+  { name:'Light – Moderate Activity', desc:'Some sitting + regular movement; consistent but not intense exercise 3–4 days a week.',           mult:1.4625 },
+  { name:'Moderately Active',         desc:'Often on your feet — nurse, teacher, retail worker; regular exercise 3–5 days a week.',           mult:1.55   },
+  { name:'Very Active',               desc:'Physically demanding job + hard exercise 6–7 days a week (e.g. construction worker).',            mult:1.725  },
+  { name:'Extra Active',              desc:'Heavy manual labour every day; also participates in sport daily.',                                 mult:1.9    },
+];
+
+const mealIcons  = ['\u{1F305}','\u2600\uFE0F','\u{1F307}','\u{1F319}'];
+const mealNames1 = ['Daily Total'];
+const mealNames2 = ['Breakfast','Dinner'];
+const mealNames3 = ['Breakfast','Lunch','Dinner'];
+const mealNames4 = ['Breakfast','Lunch','Dinner','Snack'];
+
+function renderActivities() {
+  document.getElementById('activity-options').innerHTML = activities.map((a,i) => `
+    <div class="activity-option" id="act-${i}" onclick="selectActivity(${i})">
+      <div class="radio-dot"></div>
+      <div class="act-text">
+        <div class="act-name">${a.name}</div>
+        <div class="act-desc">${a.desc}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function selectActivity(i) {
+  if (activityIdx !== null) document.getElementById('act-'+activityIdx).classList.remove('selected');
+  activityIdx = i;
+  document.getElementById('act-'+i).classList.add('selected');
+}
+
+function setGender(g, btn) {
+  gender = g;
+  btn.closest('.seg').querySelectorAll('button').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+function setGoal(g, btn) {
+  weightGoal = g;
+  btn.closest('.goal-grid').querySelectorAll('button').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+function setHeightUnit(unit, btn) {
+  heightUnit = unit;
+  document.querySelectorAll('#height-cm-row .unit-pill button, #height-ft-row .unit-pill button').forEach(b => {
+    b.classList.toggle('active',
+      (unit==='cm' && b.textContent.trim()==='cm') || (unit==='ft' && b.textContent.trim()==='ft / in')
+    );
+  });
+  document.getElementById('height-cm-row').style.display = unit==='cm' ? '' : 'none';
+  document.getElementById('height-ft-row').style.display = unit==='ft' ? '' : 'none';
+}
+function setWeightUnit(unit, btn) {
+  weightUnit = unit;
+  document.querySelectorAll('#weight-kg-row .unit-pill button, #weight-lbs-row .unit-pill button').forEach(b => {
+    b.classList.toggle('active',
+      (unit==='kg' && b.textContent.trim()==='kg') || (unit==='lbs' && b.textContent.trim()==='lbs')
+    );
+  });
+  document.getElementById('weight-kg-row').style.display  = unit==='kg'  ? '' : 'none';
+  document.getElementById('weight-lbs-row').style.display = unit==='lbs' ? '' : 'none';
+}
+function setMeals(n, btn) {
+  mealsPerDay = n;
+  btn.closest('.meals-grid').querySelectorAll('button').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  if (dailyCarbs > 0) renderDistribution();
+}
+function setDist(mode, btn) {
+  distMode = mode;
+  btn.closest('.dist-toggle').querySelectorAll('button').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  if (dailyCarbs > 0) renderDistribution();
+}
+
+function getHeightCm() {
+  if (heightUnit==='cm') return parseFloat(document.getElementById('height-cm').value)||0;
+  const ft  = parseFloat(document.getElementById('height-ft').value)||0;
+  const inc = parseFloat(document.getElementById('height-in').value)||0;
+  return (ft*30.48)+(inc*2.54);
+}
+function getWeightKg() {
+  if (weightUnit==='kg') return parseFloat(document.getElementById('weight-kg').value)||0;
+  return (parseFloat(document.getElementById('weight-lbs').value)||0)*0.453592;
+}
+function showError(msg) {
+  const el = document.getElementById('error-msg');
+  el.textContent = msg; el.classList.add('show');
+}
+function clearError() { document.getElementById('error-msg').classList.remove('show'); }
+
+function calculate() {
+  clearError();
+  const age       = parseFloat(document.getElementById('age').value)||0;
+  const heightCm  = getHeightCm();
+  const weightKg  = getWeightKg();
+  const curHba1c  = parseFloat(document.getElementById('current-hba1c').value)||6.5;
+  const goalHba1c = parseFloat(document.getElementById('goal-hba1c').value)||5.7;
+
+  if (!age||age<1||age>120)   { showError('Please enter a valid age (1–120).'); return; }
+  if (!heightCm||heightCm<50) { showError('Please enter a valid height.'); return; }
+  if (!weightKg||weightKg<10) { showError('Please enter a valid weight.'); return; }
+  if (activityIdx===null)     { showError('Please select your activity level.'); return; }
+  if (goalHba1c>curHba1c)     { showError('Your goal HbA1c should be lower than or equal to your current HbA1c.'); return; }
+
+  // Mifflin-St Jeor BMR
+  const bmr  = (10*weightKg)+(6.25*heightCm)-(5*age)+(gender==='male' ? 5 : -161);
+  let   tdee = bmr * activities[activityIdx].mult;
+  if (weightGoal==='lose') tdee = Math.max(tdee-500, bmr*0.85);
+
+  // Carb %: base 30%, reduced by elevation above normal + 3-month urgency
+  const elevationAboveNormal = Math.max(0, curHba1c - 5.7);
+  const gapToClose           = Math.max(0, curHba1c - goalHba1c);
+  let carbPct = 35;
+  carbPct -= elevationAboveNormal * 3.5;
+  carbPct  = Math.max(20, Math.min(35, carbPct));
+
+  dailyCarbs = Math.round((tdee * carbPct / 100) / 4);
+
+  // BMI
+  const heightM = heightCm/100;
+  const bmi     = (weightKg/(heightM*heightM)).toFixed(1);
+  const bmiCat  = bmi<18.5?'Underweight':bmi<25?'Normal weight':bmi<30?'Overweight':'Obese';
+
+  // eAG for goal only (mg/dL): formula = 28.7 × HbA1c − 46.7
+  const eagGoalMgdl = Math.round((28.7 * goalHba1c) - 46.7);
+
+  // Result card
+  document.getElementById('result-number').textContent = dailyCarbs;
+  document.getElementById('result-subtitle').textContent =
+    `${Math.round(carbPct)}% of your ${Math.round(tdee).toLocaleString()} kcal daily target`;
+  document.getElementById('result-details').textContent =
+    `Based on your HbA1c goal of ${goalHba1c}% over 3 months.` +
+    (weightGoal==='lose' ? ' Includes a 500 kcal/day deficit for weight loss.' : '');
+
+  document.getElementById('result-pills').innerHTML = [
+    `🧪 HbA1c ${curHba1c}% → ${goalHba1c}%`,
+    `📊 ${Math.round(carbPct)}% carb ratio`,
+    weightGoal==='lose' ? '⚖️ Weight loss mode' : '⚖️ Maintenance mode',
+  ].map(t=>`<span class="result-pill">${t}</span>`).join('');
+
+  // Context chips
+  document.getElementById('ctx-bmi').textContent     = bmi;
+  document.getElementById('ctx-bmi-cat').textContent  = bmiCat;
+  document.getElementById('ctx-eag-goal').textContent = `${eagGoalMgdl} mg/dL`;
+
+  document.getElementById('result-card').classList.add('show');
+  document.getElementById('context-row').classList.add('show');
+  document.getElementById('dist-card').classList.add('show');
+  renderDistribution();
+
+  setTimeout(()=>document.getElementById('result-card').scrollIntoView({behavior:'smooth',block:'start'}),80);
+}
+
+function renderDistribution() {
+  const names = mealsPerDay===1?mealNames1:mealsPerDay===2?mealNames2:mealsPerDay===3?mealNames3:mealNames4;
+  let portions = [];
+  if (distMode==='equal') {
+    const base=Math.floor(dailyCarbs/mealsPerDay), rem=dailyCarbs-base*mealsPerDay;
+    for(let i=0;i<mealsPerDay;i++) portions.push(i===0?base+rem:base);
+  } else {
+    const first=Math.round(dailyCarbs*0.5), left=dailyCarbs-first, others=mealsPerDay-1;
+    if(others===0){ portions=[dailyCarbs]; }
+    else {
+      const base=Math.floor(left/others), rem=left-base*others;
+      portions=[first];
+      for(let i=0;i<others;i++) portions.push(i===0?base+rem:base);
+    }
+  }
+  const icons = ['\u{1F305}','\u2600\uFE0F','\u{1F307}','\u{1F319}'];
+  document.getElementById('meal-rows').innerHTML = portions.map((p,i)=>{
+    const pct=Math.round((p/dailyCarbs)*100);
+    return `<div class="meal-row">
+      <div class="meal-row-left">
+        <div class="meal-icon">${icons[i]||'\u{1F37D}'}</div>
+        <div>
+          <div class="meal-row-label">${names[i]}</div>
+          <div class="meal-row-pct">${pct}% of daily allowance</div>
+        </div>
+      </div>
+      <div>
+        <div class="meal-row-value">${p}</div>
+        <div class="meal-row-unit">g carbs</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+renderActivities();
+</script>
+</body>
+</html>
